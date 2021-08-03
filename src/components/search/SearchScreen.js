@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import queryString from 'query-string';
 
 import { useLocation } from 'react-router-dom';
-import { heroes } from '../../data/heroes';
 import { useForm } from '../../hooks/useForm';
 import { HeroCard } from '../heroes/HeroCard';
+import { getHeroByName } from '../../selectors/getHeroByName';
 
 export const SearchScreen = ({ history }) => {
 
@@ -18,7 +18,7 @@ export const SearchScreen = ({ history }) => {
 
     const {searchText} = formValues;
 
-    const heroesFiltered = heroes;
+    const heroesFiltered = useMemo(() => getHeroByName(q), [q]);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -58,6 +58,22 @@ export const SearchScreen = ({ history }) => {
                 <div className='col-7'>
                     <h4>Results</h4>
                     <hr/>
+                    
+                    {
+                        (q === '')
+                            &&
+                            <div className='alert alert-info'>
+                                Search a hero
+                            </div>
+                    }
+
+                    {
+                        (q !== '' && heroesFiltered.length === 0)
+                            &&
+                            <div className='alert alert-danger'>
+                                There is no a hero with { q }
+                            </div>
+                    }
 
                     {
                         heroesFiltered.map(hero => (
